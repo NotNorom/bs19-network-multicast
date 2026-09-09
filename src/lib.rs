@@ -1,5 +1,4 @@
 use std::{
-    ascii::escape_default,
     mem::MaybeUninit,
     net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4},
     num::NonZeroU16,
@@ -169,10 +168,7 @@ pub fn initialized_bytes(buf: &[MaybeUninit<u8>], len: usize) -> &[u8] {
 
 pub fn print_buffer(buffer: &[u8]) {
     for chunk in buffer.chunks(32) {
-        let chunk_as_str = {
-            String::from_utf8_lossy(chunk)
-        };
-
+        let chunk_as_str = { String::from_utf8_lossy(chunk) };
 
         // let chunk_as_str = String::from_utf8(
         //     chunk

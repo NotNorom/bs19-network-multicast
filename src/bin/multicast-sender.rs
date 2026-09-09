@@ -33,7 +33,7 @@ fn main() {
 
     println!(
         "sending to addresses {:?}",
-        &multicast_addresses
+        multicast_addresses
             .iter()
             .map(|addr| addr.as_socket_ipv4().unwrap())
             .collect::<Vec<_>>()
@@ -65,7 +65,7 @@ fn main() {
 
         let errors = multicast_addresses
             .iter()
-            .map(|multicast_addr| socket.send_to(&buffer[0..bytes_read].as_bytes(), multicast_addr))
+            .map(|multicast_addr| socket.send_to(&buffer.as_bytes()[0..bytes_read], multicast_addr))
             .filter_map(|res| res.err())
             .collect::<Vec<_>>();
 

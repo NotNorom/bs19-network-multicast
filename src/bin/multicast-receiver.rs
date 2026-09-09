@@ -44,7 +44,7 @@ fn main() {
 
     println!(
         "listening on addresses {:?}",
-        &multicast_addresses
+        multicast_addresses
             .iter()
             .map(|addr| addr.as_socket_ipv4().unwrap())
             .collect::<Vec<_>>()
@@ -58,9 +58,9 @@ fn main() {
         buffer.fill(MaybeUninit::zeroed());
 
         let read_res = socket.recv_from(&mut buffer).map_err(ReceiveError::from);
-        println!("{read_res:?}");
+        // println!("{read_res:?}");
 
-        let (bytes_read, sender_addr) = match read_res.map_err(ReceiveError::from) {
+        let (bytes_read, sender_addr) = match read_res {
             Ok(read_bytes) => read_bytes,
             Err(err) => match err {
                 ReceiveError::Io(ref io_error) => match io_error.kind() {
