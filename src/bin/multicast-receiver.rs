@@ -1,5 +1,5 @@
 use std::{
-    io::ErrorKind::TimedOut,
+    io::ErrorKind::{TimedOut, WouldBlock},
     mem::MaybeUninit,
     sync::{
         Arc,
@@ -42,20 +42,32 @@ fn main() {
 
     let mut buffer = [MaybeUninit::new(0u8); 1024];
 
-    println!("listening on addresses {:?}", &multicast_addresses.iter().map(|addr| addr.as_socket_ipv4().unwrap()).collect::<Vec<_>>());
+    println!(
+        "listening on addresses {:?}",
+        &multicast_addresses
+            .iter()
+            .map(|addr| addr.as_socket_ipv4().unwrap())
+            .collect::<Vec<_>>()
+    );
 
     let error = loop {
         if !running.load(Ordering::SeqCst) {
             break ReceiveError::CtrlC;
         }
 
+        buffer.fill(MaybeUninit::zeroed());
+
         let read_res = socket.recv_from(&mut buffer).map_err(ReceiveError::from);
+        println!("{read_res:?}");
 
         let (bytes_read, sender_addr) = match read_res.map_err(ReceiveError::from) {
             Ok(read_bytes) => read_bytes,
             Err(err) => match err {
                 ReceiveError::Io(ref io_error) => match io_error.kind() {
                     TimedOut => {
+                        continue;
+                    }
+                    WouldBlock => {
                         continue;
                     }
                     _ => break err,

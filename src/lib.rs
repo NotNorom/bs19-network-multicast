@@ -37,6 +37,8 @@ pub fn create_socket(addr: SocketAddr) -> Result<Socket, ReceiveError> {
     }
 
     socket.set_reuse_address(true)?;
+    socket.set_multicast_loop_v4(true)?;
+    socket.set_multicast_all_v4(true)?;
 
     let ip = match addr.ip() {
         // after many many MANY hours of testing and research I figured out:
@@ -167,16 +169,27 @@ pub fn initialized_bytes(buf: &[MaybeUninit<u8>], len: usize) -> &[u8] {
 
 pub fn print_buffer(buffer: &[u8]) {
     for chunk in buffer.chunks(32) {
-        let chunk_as_str = String::from_utf8(
-            chunk
-                .as_ref()
-                .iter()
-                .filter(|b| b.is_ascii_alphanumeric() || b.is_ascii_graphic() || b.is_ascii_hexdigit())
-                .map(|b| escape_default(*b))
-                .flatten()
-                .collect(),
-        )
-        .unwrap();
+        let chunk_as_str = {
+            String::from_utf8_lossy(chunk)
+        };
+
+
+        // let chunk_as_str = String::from_utf8(
+        //     chunk
+        //         .as_ref()
+        //         .iter()
+        //         // .filter(|b| {
+        //         //     b.is_ascii_alphanumeric()
+        //         //         || b.is_ascii_graphic()
+        //         //         || b.is_ascii_hexdigit()
+        //         //         || b.is_ascii_punctuation()
+        //         //         || **b == b' '
+        //         // })
+        //         .map(|b| escape_default(*b))
+        //         .flatten()
+        //         .collect(),
+        // )
+        // .unwrap();
         for byte in chunk {
             print!("{byte:0>3} ");
         }
