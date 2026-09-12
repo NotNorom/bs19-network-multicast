@@ -36,8 +36,6 @@ pub fn create_socket(addr: SocketAddr) -> Result<Socket, ReceiveError> {
     }
 
     socket.set_reuse_address(true)?;
-    socket.set_multicast_loop_v4(true)?;
-    socket.set_multicast_all_v4(true)?;
 
     let ip = match addr.ip() {
         // after many many MANY hours of testing and research I figured out:
